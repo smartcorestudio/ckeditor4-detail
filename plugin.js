@@ -15,7 +15,8 @@
                         selector: 'p[data-details=summary]'
                     },
                     content: {
-                        selector: 'div[data-details=content]'
+                        selector: 'div[data-details=content]',
+                        allowedContent: 'br em strong sub sup u s; a[!href,target]'
                     }
                 },
                 allowedContent: 'details summary',
@@ -25,16 +26,11 @@
                         return false;
                     }
 
-                    var s = el.getFirst('summary');
-                    var html = s.getOuterHtml() + '<p data-details="summary">' + s.getHtml() + '</p><div data-details="content">';
-                    var crit = function (c) {
-                        return c.name !== 'summary';
-                    };
-                    el.find(crit).forEach(function (item) {
-                        html += item.getOuterHtml();
+                    var s = el.getFirst('summary').getHtml();
+                    el.find('summary').forEach(function (item) {
+                        item.remove();
                     });
-                    html += '</div>';
-                    el.setHtml(html);
+                    el.setHtml('<summary>' + s + '</summary><p data-details="summary">' + s + '</p><div data-details="content">' + el.getHtml() + '</div>');
 
                     return true;
                 },
