@@ -1,6 +1,14 @@
 'use strict';
 
 (function (CKEDITOR) {
+    var tpl = '<summary>###Summary###</summary><p data-details="summary">###Summary###</p><div data-details="content">###Content###</div>';
+    var critSummary = function (c) {
+        return c.name === 'p' && c.attributes['data-details'] === 'summary';
+    };
+    var critContent = function (c) {
+        return c.name === 'div' && c.attributes['data-details'] === 'content';
+    };
+
     CKEDITOR.plugins.add('detail', {
         requires: 'widget',
         icons: 'detail',
@@ -9,7 +17,7 @@
         init: function (editor) {
             editor.widgets.add('detail', {
                 button: editor.lang.detail.title,
-                template: '<details><p data-details="summary">Summary</p><div data-details="content">Content</div></details>',
+                template: '<details>' + tpl + '</details>',
                 editables: {
                     summary: {
                         selector: 'p[data-details=summary]'
@@ -30,20 +38,23 @@
                     el.find('summary').forEach(function (item) {
                         item.remove();
                     });
-                    el.setHtml('<summary>' + s + '</summary><p data-details="summary">' + s + '</p><div data-details="content">' + el.getHtml() + '</div>');
+                    el.setHtml(tpl.replace(/###Summary###/g, s).replace('###Content###', el.getHtml()));
 
                     return true;
                 },
                 downcast: function (el) {
-                    var crit = function (c) {
-                        return c.name === 'p' && c.attributes['data-details'] === 'summary';
-                    };
-                    var html = '<summary>' + el.getFirst(crit).getHtml() + '</summary>';
-                    crit = function (c) {
-                        return c.name === 'div' && c.attributes['data-details'] === 'content';
-                    };
-                    html += el.getFirst(crit).getHtml();
-                    el.setHtml(html);
+                    el.attributes = [];
+                    el.setHtml('<summary>' + el.getFirst(critSummary).getHtml() + '</summary>' + el.getFirst(critContent).getHtml());
+                },
+                init: function () {
+                    var s1 = this.element.findOne('summary');
+                    var s2 = this.element.findOne('p[data-details=summary]');
+
+                    if (!!s1 && !!s2) {
+                        s2.on('blur', function () {
+                            s1.setHtml(s2.getHtml());
+                        });
+                    }
                 }
             });
         }
