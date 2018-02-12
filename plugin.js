@@ -9,41 +9,56 @@
         init: function (editor) {
             editor.widgets.add('detail', {
                 button: editor.lang.detail.title,
-                template: '<details><p data-details="summary">Summary</p><div data-details="content">Content</div></details>',
+                template: '<details><summary>Summary</summary><section>Content</section></details>',
                 editables: {
                     summary: {
-                        selector: 'p[data-details=summary]'
+                        selector: 'summary'
                     },
                     content: {
-                        selector: 'div[data-details=content]',
+                        selector: 'section',
                         allowedContent: 'br em strong sub sup u s; a[!href,target]'
                     }
                 },
                 allowedContent: 'details summary',
-                requiredContent: 'details; p[data-details=summary]; div[data-details=content]',
+                requiredContent: 'details; summary; section',
                 upcast: function (el) {
                     if (el.name !== 'details') {
                         return false;
                     }
 
-                    var s = el.getFirst('summary').getHtml();
-                    el.find('summary').forEach(function (item) {
-                        item.remove();
+                    var summary = el.getFirst('summary');
+                    var content = new CKEDITOR.htmlParser.element('section');
+
+                    el.children.forEach(function (item) {
+                        if (item.name !== 'summary') {
+                            content.add(item);
+                        }
                     });
-                    el.setHtml('<summary>' + s + '</summary><p data-details="summary">' + s + '</p><div data-details="content">' + el.getHtml() + '</div>');
+
+                    el.children = [];
+                    el.add(summary);
+                    el.add(content);
 
                     return true;
                 },
                 downcast: function (el) {
-                    var crit = function (c) {
-                        return c.name === 'p' && c.attributes['data-details'] === 'summary';
-                    };
-                    var html = '<summary>' + el.getFirst(crit).getHtml() + '</summary>';
-                    crit = function (c) {
-                        return c.name === 'div' && c.attributes['data-details'] === 'content';
-                    };
-                    html += el.getFirst(crit).getHtml();
-                    el.setHtml(html);
+                    el.attributes = [];
+                    var summary = el.getFirst('summary');
+                    summary.attributes = [];
+                    var content = el.getFirst('section');
+                    el.children = [];
+                    el.add(summary);
+                    content.children.forEach(function (item) {
+                        el.add(item);
+                    });
+                },
+                init: function () {
+                    var summary = this.element.findOne('summary');
+
+                    summary.setAttribute('contenteditable', true);
+                    summary.on('click', function () {
+                        summary.focus();
+                    });
                 }
             });
         }
