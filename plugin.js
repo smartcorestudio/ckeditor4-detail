@@ -44,13 +44,6 @@
                     };
                     html += el.getFirst(crit).getHtml();
                     el.setHtml(html);
-                },
-                init: function () {
-                    var widget = this;
-                    var el = this.element;
-                },
-                data: function () {
-                    var el = this.element;
                 }
             });
         }
