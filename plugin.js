@@ -24,7 +24,7 @@
                     },
                     content: {
                         selector: 'div[data-details=content]',
-                        allowedContent: 'br em strong sub sup u s; a[!href,target]'
+                        allowedContent: 'br p em s strong sub sup u; a[!href,target]'
                     }
                 },
                 allowedContent: 'details summary',
