@@ -15,8 +15,7 @@
                         selector: 'p[data-details]'
                     },
                     div: {
-                        selector: 'div[data-details]',
-                        allowedContent: 'br p em s strong sub sup u; a[!href,target]'
+                        selector: 'div[data-details]'
                     }
                 },
                 allowedContent: 'details summary',
@@ -55,7 +54,8 @@
                 downcast: function (el) {
                     var div = el.children[2];
                     el.attributes = [];
-                    el.children = el.children.slice(0, 1).concat(div.children);
+                    el.children = el.children.slice(0, 1);
+                    el.setHtml(el.getHtml() + this.editables['div'].getData());
                 },
                 init: function () {
                     var summary = this.element.getChild(0);
