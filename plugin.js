@@ -1,14 +1,6 @@
 'use strict';
 
 (function (CKEDITOR) {
-    var tpl = '<summary>###Summary###</summary><p data-details="summary">###Summary###</p><div data-details="content">###Content###</div>';
-    var critSummary = function (c) {
-        return c.name === 'p' && c.attributes['data-details'] === 'summary';
-    };
-    var critContent = function (c) {
-        return c.name === 'div' && c.attributes['data-details'] === 'content';
-    };
-
     CKEDITOR.plugins.add('detail', {
         requires: 'widget',
         icons: 'detail',
@@ -17,44 +9,56 @@
         init: function (editor) {
             editor.widgets.add('detail', {
                 button: editor.lang.detail.title,
-                template: '<details>' + tpl + '</details>',
+                template: '<details><summary>Summary</summary><p>Content</p></details>',
                 editables: {
                     summary: {
-                        selector: 'p[data-details=summary]'
+                        selector: 'p[data-details]'
                     },
                     content: {
-                        selector: 'div[data-details=content]',
+                        selector: 'div[data-details]',
                         allowedContent: 'br p em s strong sub sup u; a[!href,target]'
                     }
                 },
                 allowedContent: 'details summary',
-                requiredContent: 'details; p[data-details=summary]; div[data-details=content]',
+                requiredContent: 'details; summary; div[data-details]',
                 upcast: function (el) {
-                    if (el.name !== 'details') {
-                        return false;
-                    }
-
-                    var s = el.getFirst('summary').getHtml();
-                    el.find('summary').forEach(function (item) {
-                        item.remove();
-                    });
-                    el.setHtml(tpl.replace(/###Summary###/g, s).replace('###Content###', el.getHtml()));
-
-                    return true;
+                    return el.name === 'details' && el.children && el.children[0].name === 'summary';
                 },
                 downcast: function (el) {
+                    var div = el.children[2];
                     el.attributes = [];
-                    el.setHtml('<summary>' + el.getFirst(critSummary).getHtml() + '</summary>' + el.getFirst(critContent).getHtml());
+                    el.children = el.children.slice(0, 1).concat(div.children);
                 },
                 init: function () {
-                    var s1 = this.element.findOne('summary');
-                    var s2 = this.element.findOne('p[data-details=summary]');
+                    var el = this.element;
+                    var summary, p, div;
 
-                    if (!!s1 && !!s2) {
-                        s2.on('blur', function () {
-                            s1.setHtml(s2.getHtml());
-                        });
+                    if (el.getChildren().length !== 3
+                        || el.getChild(1).getName() !== 'p'
+                        || !el.getChild(1).getAttribute('data-details')
+                        || el.getChild(2).getName() !== 'div'
+                        || !el.getChild(2).getAttribute('data-details')
+                    ) {
+
+                        div = new CKEDITOR.dom.element('div');
+                        div.setAttribute('data-details', true);
+                        el.moveChildren(div);
+                        div.getChild(0).move(el);
+                        p = new CKEDITOR.dom.element('p');
+                        p.setAttribute('data-details', true);
+                        p.appendTo(el);
+                        div.appendTo(el);
                     }
+
+                    summary = el.getChild(0);
+                    p = el.getChild(1);
+                    p.setAttribute('contenteditable', true);
+                    p.setHtml(summary.getHtml());
+                    p.on('blur', function () {
+                        summary.setHtml(p.getHtml());
+                    });
+                    div.getChild(2);
+                    div.setAttribute('contenteditable', true);
                 }
             });
         }
