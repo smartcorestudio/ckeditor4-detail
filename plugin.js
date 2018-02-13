@@ -34,9 +34,9 @@
 
                         if (el.children.length >= 2 && el.children[1].name === 'p' && el.children[1].attributes.hasOwnProperty('data-details')) {
                             p = el.children[1];
-                            el.add(p, 1);
                         } else {
                             p = new CKEDITOR.htmlParser.element('p', {'data-details': ''});
+                            el.add(p, 1);
                         }
 
                         if (el.children.length >= 3 && el.children[2].name === 'div' && el.children[2].attributes.hasOwnProperty('data-details')) {
@@ -44,7 +44,7 @@
                         } else {
                             div = new CKEDITOR.htmlParser.element('div', {'data-details': ''});
                             div.children = el.children.slice(2);
-                            el.add(div);
+                            el.add(div, 2);
                         }
 
                         el.children = el.children.slice(0, 3);
