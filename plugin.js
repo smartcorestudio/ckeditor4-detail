@@ -25,20 +25,14 @@
                         return false;
                     }
 
-                    if (el.children.length !== 3
-                        || el.children[1].name !== 'p' || !el.children[1].attributes.hasOwnProperty('data-details')
-                        || el.children[2].name !== 'div' || !el.children[2].attributes.hasOwnProperty('data-details')
-                    ) {
-                        if (el.children.length < 2 || el.children[1].name !== 'p' || !el.children[1].attributes.hasOwnProperty('data-details')) {
-                            el.add(new CKEDITOR.htmlParser.element('p', {'data-details': ''}), 1);
-                        }
+                    if (el.children.length < 2 || el.children[1].name !== 'p' || !el.children[1].attributes.hasOwnProperty('data-details')) {
+                        el.add(new CKEDITOR.htmlParser.element('p', {'data-details': ''}), 1);
+                    }
 
-                        if (el.children.length < 3 || el.children[2].name !== 'div' || !el.children[2].attributes.hasOwnProperty('data-details')) {
-                            var div = new CKEDITOR.htmlParser.element('div', {'data-details': ''});
-                            div.children = el.children.slice(2);
-                            el.add(div, 2);
-                        }
-
+                    if (el.children.length !== 3 || el.children[2].name !== 'div' || !el.children[2].attributes.hasOwnProperty('data-details')) {
+                        var div = new CKEDITOR.htmlParser.element('div', {'data-details': ''});
+                        div.children = el.children.slice(2);
+                        el.add(div, 2);
                         el.children = el.children.slice(0, 3);
                     }
 
