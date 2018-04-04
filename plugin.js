@@ -29,19 +29,12 @@
                         || el.children[1].name !== 'p' || !el.children[1].attributes.hasOwnProperty('data-details')
                         || el.children[2].name !== 'div' || !el.children[2].attributes.hasOwnProperty('data-details')
                     ) {
-                        var p, div;
-
-                        if (el.children.length >= 2 && el.children[1].name === 'p' && el.children[1].attributes.hasOwnProperty('data-details')) {
-                            p = el.children[1];
-                        } else {
-                            p = new CKEDITOR.htmlParser.element('p', {'data-details': ''});
-                            el.add(p, 1);
+                        if (el.children.length < 2 || el.children[1].name !== 'p' || !el.children[1].attributes.hasOwnProperty('data-details')) {
+                            el.add(new CKEDITOR.htmlParser.element('p', {'data-details': ''}), 1);
                         }
 
-                        if (el.children.length >= 3 && el.children[2].name === 'div' && el.children[2].attributes.hasOwnProperty('data-details')) {
-                            div = el.children[2];
-                        } else {
-                            div = new CKEDITOR.htmlParser.element('div', {'data-details': ''});
+                        if (el.children.length < 3 || el.children[2].name !== 'div' || !el.children[2].attributes.hasOwnProperty('data-details')) {
+                            var div = new CKEDITOR.htmlParser.element('div', {'data-details': ''});
                             div.children = el.children.slice(2);
                             el.add(div, 2);
                         }
@@ -52,7 +45,6 @@
                     return true;
                 },
                 downcast: function (el) {
-                    var div = el.children[2];
                     el.attributes = [];
                     el.children = el.children.slice(0, 1);
                     el.setHtml(el.getHtml() + this.editables['div'].getData());
