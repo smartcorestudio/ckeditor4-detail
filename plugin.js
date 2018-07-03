@@ -1,6 +1,8 @@
 'use strict';
 
 (function (CKEDITOR) {
+    var h = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
     CKEDITOR.plugins.add('detail', {
         requires: 'widget',
         icons: 'detail',
@@ -9,47 +11,54 @@
         init: function (editor) {
             editor.widgets.add('detail', {
                 button: editor.lang.detail.title,
-                template: '<details><summary>Summary</summary><p class="details-summary"></p><div class="details-content"><p>Content</p></div></details>',
+                template: '<details><summary>Summary</summary><p class="head"></p><div class="content"><p>Content</p></div></details>',
                 editables: {
-                    summary: {
-                        selector: 'p.details-summary'
+                    head: {
+                        selector: '.head'
                     },
                     content: {
-                        selector: 'div.details-content'
+                        selector: '.content'
                     }
                 },
                 allowedContent: 'details summary',
-                requiredContent: 'details; summary; p(details-summary); div(details-content)',
+                requiredContent: 'details; summary; ' + h.join(' ') + ' p(head); div(content)',
                 upcast: function (el) {
                     if (el.name !== 'details') {
                         return false;
                     }
 
-                    if (el.children.length <= 0 || el.children[0].name !== 'summary') {
-                        var summary = new CKEDITOR.htmlParser.element('summary');
+                    var summary;
+                    var head = 'p';
+                    var content = new CKEDITOR.htmlParser.element('div', {'class': 'content'});
 
-                        summary.add(new CKEDITOR.htmlParser.text('Summary'));
+                    if (el.children.length > 0 && el.children[0].name === 'summary') {
+                        summary = el.children[0];
+                    } else {
+                        summary = new CKEDITOR.htmlParser.element('summary');
                         el.add(summary, 0);
                     }
 
-                    if (el.children.length < 2 || el.children[1].name !== 'p' || !el.children[1].hasClass('details-summary')) {
-                        el.add(new CKEDITOR.htmlParser.element('p', {'class': 'details-summary'}), 1);
+                    if (summary.children.length > 0 && summary.children[0].type === CKEDITOR.NODE_ELEMENT && h.indexOf(summary.children[0].name) >= 0) {
+                        head = summary.children[0].name;
+                        summary.children = summary.children[0].children;
                     }
 
-                    if (el.children.length !== 3 || el.children[2].name !== 'div' || !el.children[2].hasClass('details-content')) {
-                        var div = new CKEDITOR.htmlParser.element('div', {'class': 'details-content'});
-
-                        if (el.children.length > 2) {
-                            div.children = el.children.slice(2);
-                        } else {
-                            var p = new CKEDITOR.htmlParser.element('p');
-                            p.add(new CKEDITOR.htmlParser.text('Content'));
-                            div.add(p);
-                        }
-
-                        el.add(div, 2);
-                        el.children = el.children.slice(0, 3);
+                    if (summary.children.length <= 0) {
+                        summary.add(new CKEDITOR.htmlParser.text('Summary'));
                     }
+
+                    el.add(new CKEDITOR.htmlParser.element(head, {'class': 'head'}), 1);
+
+                    if (el.children.length > 2) {
+                        content.children = el.children.slice(2);
+                    } else {
+                        var p = new CKEDITOR.htmlParser.element('p');
+                        p.add(new CKEDITOR.htmlParser.text('Content'));
+                        content.add(p);
+                    }
+
+                    el.add(content, 2);
+                    el.children = el.children.slice(0, 3);
 
                     return true;
                 },
@@ -60,11 +69,11 @@
                 },
                 init: function () {
                     var summary = this.element.getChild(0);
-                    var p = this.element.getChild(1);
+                    var head = this.element.getChild(1);
 
-                    p.setHtml(summary.getHtml());
-                    p.on('blur', function () {
-                        summary.setHtml(p.getHtml());
+                    head.setHtml(summary.getHtml());
+                    head.on('blur', function () {
+                        summary.setHtml(head.getHtml());
                     });
                 }
             });
