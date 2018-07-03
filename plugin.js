@@ -38,13 +38,10 @@
                         el.add(summary, 0);
                     }
 
-                    if (summary.children.length > 0 && summary.children[0].type === CKEDITOR.NODE_ELEMENT && h.indexOf(summary.children[0].name) >= 0) {
-                        head = summary.children[0].name;
-                        summary.children = summary.children[0].children;
-                    }
-
                     if (summary.children.length <= 0) {
                         summary.add(new CKEDITOR.htmlParser.text('Summary'));
+                    } else if (summary.children[0].type === CKEDITOR.NODE_ELEMENT && h.indexOf(summary.children[0].name) >= 0) {
+                        head = summary.children[0].name;
                     }
 
                     el.add(new CKEDITOR.htmlParser.element(head, {'class': 'head'}), 1);
@@ -70,10 +67,11 @@
                 init: function () {
                     var summary = this.element.getChild(0);
                     var head = this.element.getChild(1);
+                    var ref = h.indexOf(head.getName()) >= 0 ? summary.getChild(0) : summary;
 
-                    head.setHtml(summary.getHtml());
+                    head.setHtml(ref.getHtml());
                     head.on('blur', function () {
-                        summary.setHtml(head.getHtml());
+                        ref.setHtml(head.getHtml());
                     });
                 }
             });
