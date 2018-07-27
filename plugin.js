@@ -1,8 +1,6 @@
 'use strict';
 
 (function (CKEDITOR) {
-    var h = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
-
     CKEDITOR.dtd['$editable']['summary'] = 1;
     CKEDITOR.plugins.add('detail', {
         requires: 'widget',
@@ -32,18 +30,12 @@
                     var summary = el.getFirst('summary');
                     var content = new CKEDITOR.htmlParser.element('div', {'class': 'details-content'});
 
-                    if (!!summary) {
-                        if (summary.children.length > 0 && summary.children[0].type === CKEDITOR.NODE_ELEMENT) {
-                            if (h.indexOf(summary.children[0].name) >= 0) {
-                                summary.attributes['data-details-head'] = summary.children[0].name;
-                            }
-
-                            summary.setHtml(summary.children[0].getHtml());
-                        } else if (summary.children.length > 0 && summary.children[0].type === CKEDITOR.NODE_TEXT) {
-                            summary.setHtml(summary.children[0].value);
-                        } else {
-                            summary.setHtml('Summary');
-                        }
+                    if (!!summary && summary.children.length > 0 && summary.children[0].type === CKEDITOR.NODE_ELEMENT) {
+                        summary.setHtml(summary.children[0].getHtml());
+                    } else if (!!summary && summary.children.length > 0 && summary.children[0].type === CKEDITOR.NODE_TEXT) {
+                        summary.setHtml(summary.children[0].value);
+                    } else if (!!summary) {
+                        summary.setHtml('Summary');
                     } else {
                         summary = new CKEDITOR.htmlParser.element('summary');
                         summary.setHtml('Summary');
@@ -60,17 +52,6 @@
                     return true;
                 },
                 downcast: function (el) {
-                    var summary = el.children[0];
-                    var content = el.children[1];
-                    var headEl = summary.attributes['data-details-head'] || null;
-
-                    if (headEl) {
-                        var head = new CKEDITOR.htmlParser.element(headEl);
-                        head.setHtml(summary.getHtml());
-                        summary.add(head, 0);
-                        summary.children = el.children.slice(0, 1);
-                    }
-
                     content.replaceWithChildren();
                     el.attributes = [];
                 },
