@@ -52,8 +52,9 @@
                     return true;
                 },
                 downcast: function (el) {
-                    el.children[1].replaceWithChildren();
                     el.attributes = [];
+                    el.children = el.children.slice(0, 1);
+                    el.setHtml(el.getHtml() + this.editables.content.getData());
                 },
                 init: function () {
                     var summary = this.element.getChild(0);
