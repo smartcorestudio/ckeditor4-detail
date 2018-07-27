@@ -6,6 +6,13 @@
         icons: 'detail',
         hidpi: true,
         lang: 'de,en',
+        onLoad: function () {
+            CKEDITOR.addCss(
+                '.details:not(.details-open) > :not(.details-summary) {display: none;}' +
+                '.details-summary:first-child::before {display: inline-block; content: "▼"; margin-right: 0.5rem;}' +
+                '.details:not(.details-open) > .details-summary:first-child::before {content: "▶";}'
+            );
+        },
         init: function (editor) {
             var formatTags = editor.config.format_tags.split(';');
             var h = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].filter(function (item) {
@@ -84,6 +91,15 @@
                     editContent.replaceWithChildren();
                     el.name = 'details';
                     el.attributes = [];
+                },
+                init: function () {
+                    this.element.getChild(0).on('click', function () {
+                        if (this.getParent().hasClass('details-open')) {
+                            this.getParent().removeClass('details-open');
+                        } else {
+                            this.getParent().addClass('details-open');
+                        }
+                    });
                 }
             });
         }
