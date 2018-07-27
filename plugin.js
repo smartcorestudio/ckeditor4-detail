@@ -1,6 +1,8 @@
 'use strict';
 
 (function (CKEDITOR) {
+    var h = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
     CKEDITOR.dtd['$editable']['summary'] = 1;
     CKEDITOR.plugins.add('detail', {
         requires: 'widget',
@@ -8,11 +10,6 @@
         hidpi: true,
         lang: 'de,en',
         init: function (editor) {
-            var formatTags = editor.config.format_tags.split(';');
-            var h = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].filter(function (item) {
-                return formatTags.indexOf(item) >= 0;
-            });
-
             editor.widgets.add('detail', {
                 button: editor.lang.detail.title,
                 template: '<details><summary>Summary</summary><div class="details-content"></div></details>',
