@@ -52,7 +52,7 @@
                     return true;
                 },
                 downcast: function (el) {
-                    content.replaceWithChildren();
+                    el.children[1].replaceWithChildren();
                     el.attributes = [];
                 },
                 init: function () {
