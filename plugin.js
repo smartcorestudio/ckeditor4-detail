@@ -39,33 +39,33 @@
                     }
 
                     var editSummary = new CKEDITOR.htmlParser.element('p', {'class': 'details-summary'});
-                    var editContent = new CKEDITOR.htmlParser.element('div', {'class': 'details-content'});
-                    var first = el.getFirst('summary');
+                    var content = new CKEDITOR.htmlParser.element('div', {'class': 'details-content'});
+                    var summary = el.getFirst('summary');
                     var html = 'Summary';
 
                     el.name = 'div';
                     el.addClass('details');
                     el.add(editSummary, 0);
-                    el.add(editContent, 1);
+                    el.add(content, 1);
 
-                    if (first) {
-                        if (first.children.length > 0 && first.children[0].type === CKEDITOR.NODE_ELEMENT) {
-                            if (h.indexOf(first.children[0].name) >= 0) {
-                                editSummary.attributes['data-details-head'] = first.children[0].name;
+                    if (summary) {
+                        if (summary.children.length > 0 && summary.children[0].type === CKEDITOR.NODE_ELEMENT) {
+                            if (h.indexOf(summary.children[0].name) >= 0) {
+                                editSummary.attributes['data-details-head'] = summary.children[0].name;
                             }
 
-                            html = first.children[0].getHtml();
-                        } else if (first.children.length > 0 && first.children[0].type === CKEDITOR.NODE_TEXT) {
-                            html = first.children[0].value;
+                            html = summary.children[0].getHtml();
+                        } else if (summary.children.length > 0 && summary.children[0].type === CKEDITOR.NODE_TEXT) {
+                            html = summary.children[0].value;
                         }
 
-                        first.remove();
+                        summary.remove();
                     }
 
                     editSummary.setHtml(html);
 
                     if (el.children.length > 2) {
-                        editContent.children = el.children.slice(2);
+                        content.children = el.children.slice(2);
                         el.children = el.children.slice(0, 2);
                     }
 
@@ -73,7 +73,7 @@
                 },
                 downcast: function (el) {
                     var editSummary = el.children[0];
-                    var editContent = el.children[1];
+                    var content = el.children[1];
                     var summary = new CKEDITOR.htmlParser.element('summary');
                     var headEl = editSummary.attributes['data-details-head'] || null;
 
@@ -88,7 +88,7 @@
                     }
 
                     editSummary.remove();
-                    editContent.replaceWithChildren();
+                    content.replaceWithChildren();
                     el.name = 'details';
                     el.attributes = [];
                 },
